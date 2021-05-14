@@ -9,14 +9,14 @@ import { WebSocketLink } from "@apollo/client/link/ws";
 import { getMainDefinition } from "@apollo/client/utilities";
 
 const wsLink = new WebSocketLink({
-	uri: "ws://localhost:4000/subscriptions",
+	uri: "https://concord-brunnic.herokuapp.com/subscriptions",
 	options: {
 		reconnect: true,
 	},
 });
 
 const httpLink = createHttpLink({
-	uri: "http://localhost:4000/graphql",
+	uri: "https://concord-brunnic.herokuapp.com/graphql",
 });
 
 const splitLink = split(
