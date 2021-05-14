@@ -9,7 +9,7 @@ import { WebSocketLink } from "@apollo/client/link/ws";
 import { getMainDefinition } from "@apollo/client/utilities";
 
 const wsLink = new WebSocketLink({
-	uri: "ws://concord-brunnic.herokuapp.com/subscriptions",
+	uri: "wss://concord-brunnic.herokuapp.com/subscriptions",
 	options: {
 		reconnect: true,
 	},
