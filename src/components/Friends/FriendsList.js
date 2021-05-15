@@ -10,6 +10,7 @@ import {
 } from "@material-ui/core";
 import SearchIcon from "@material-ui/icons/Search";
 import { gql, useQuery, useLazyQuery } from "@apollo/client";
+import { connect } from "react-redux";
 
 const useStyles = makeStyles({
 	searchWrapper: {
@@ -39,12 +40,30 @@ const useStyles = makeStyles({
 	},
 });
 
-const FriendsList = ({ friends, history }) => {
+const FriendsList = ({ friends, history, user: u }) => {
 	const [search, setSearch] = React.useState("");
 	const searchRef = React.useRef(null);
 	const classes = useStyles();
 
-	const { data, loading } = useQuery(GET_CONVERSATIONS);
+	const { data, loading, subscribeToMore } = useQuery(GET_CONVERSATIONS, {
+		onCompleted: () => {
+			subscribeToMore({
+				document: GET_NEW_CONVO,
+				variables: { thisUser: u.id },
+				updateQuery: (prev, { subscriptionData }) => {
+					if (!subscriptionData.data) return prev;
+					const newFeedItem = subscriptionData.data.receivedMessage;
+					const friendExists = prev.getConversations.filter(
+						(f) => f.id == newFeedItem.id
+					);
+					if (friendExists.length > 0) return prev;
+					return Object.assign({}, prev, {
+						getConversations: [...prev.getConversations, newFeedItem],
+					});
+				},
+			});
+		},
+	});
 	const [searchFriend, { data: searchData, loading: searchLoading }] =
 		useLazyQuery(SEARCH_FRIEND);
 
@@ -162,4 +181,19 @@ const SEARCH_FRIEND = gql`
 	}
 `;
 
-export default FriendsList;
+const GET_NEW_CONVO = gql`
+	subscription receivedMessage($thisUser: ID!) {
+		receivedMessage(thisUser: $thisUser) {
+			id
+			email
+			username
+			userHandle
+		}
+	}
+`;
+
+const mapStateToProps = (state) => ({
+	user: state.user.user,
+});
+
+export default connect(mapStateToProps)(FriendsList);

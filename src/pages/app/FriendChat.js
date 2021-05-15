@@ -83,9 +83,7 @@ const FriendChat = ({ friend, user, history }) => {
 			onError: (err) => {
 				console.log(err);
 			},
-			onCompleted: () => {
-				console.log("message sent => ", message);
-			},
+			onCompleted: () => {},
 		});
 
 	const [message, setMessage] = React.useState("");
