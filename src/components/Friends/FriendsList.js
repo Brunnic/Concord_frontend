@@ -7,10 +7,11 @@ import {
 	ListItem,
 	ListItemText,
 	Divider,
+	Menu,
+	MenuItem,
 } from "@material-ui/core";
 import SearchIcon from "@material-ui/icons/Search";
 import { gql, useQuery, useLazyQuery } from "@apollo/client";
-import { connect } from "react-redux";
 
 const useStyles = makeStyles({
 	searchWrapper: {
@@ -37,6 +38,22 @@ const useStyles = makeStyles({
 	},
 	hideSearchList: {
 		display: "none",
+	},
+	sidebar: {
+		display: "flex",
+		flexDirection: "column",
+		justifyContent: "space-between",
+		height: "100%",
+	},
+	userSide: {
+		padding: "1rem",
+		color: "white",
+	},
+	online: {
+		color: "#009432",
+	},
+	offline: {
+		color: "#EA2027",
 	},
 });
 
@@ -82,80 +99,88 @@ const FriendsList = ({ friends, history, user: u }) => {
 	}, [search]);
 
 	return (
-		<div>
-			<div className={classes.searchWrapper}>
-				<Input
-					className={classes.searchInput}
-					id='search-input'
-					type='search'
-					placeholder='Search...'
-					value={search}
-					onChange={handleSearch}
-					startAdornment={
-						<InputAdornment position='start'>
-							<SearchIcon />
-						</InputAdornment>
-					}
-				/>
-
-				{searchData && !searchLoading && (
-					<List
-						component='div'
-						className={
-							searchData.searchFriend.length < 1 || search == ""
-								? classes.hideSearchList
-								: classes.searchList
-						}
-					>
-						{searchData.searchFriend.map((f) => (
-							<ListItem
-								key={f.id}
-								button
-								onClick={() => history.push("/Concord/friend/" + f.id)}
-							>
-								<ListItemText>{f.username}</ListItemText>
-							</ListItem>
-						))}
-					</List>
-				)}
-			</div>
-
+		<div className={classes.sidebar}>
 			<div>
-				<List component='nav' aria-label='friends'>
-					<ListItem
-						button
-						onClick={() => {
-							history.push("/Concord/friends");
-						}}
-					>
-						<ListItemText className={classes.text} primary='Friends' />
-					</ListItem>
-					<Divider />
-					{!data && loading ? (
-						<ListItem button>
-							<ListItemText
-								className={classes.text}
-								primary='Search For Friends'
-							/>
+				<div className={classes.searchWrapper}>
+					<Input
+						className={classes.searchInput}
+						id='search-input'
+						type='search'
+						placeholder='Search...'
+						value={search}
+						onChange={handleSearch}
+						startAdornment={
+							<InputAdornment position='start'>
+								<SearchIcon />
+							</InputAdornment>
+						}
+					/>
+
+					{searchData && !searchLoading && (
+						<List
+							component='div'
+							className={
+								searchData.searchFriend.length < 1 || search == ""
+									? classes.hideSearchList
+									: classes.searchList
+							}
+						>
+							{searchData.searchFriend.map((f) => (
+								<ListItem
+									key={f.id}
+									button
+									onClick={() => history.push("/Concord/friend/" + f.id)}
+								>
+									<ListItemText>{f.username}</ListItemText>
+								</ListItem>
+							))}
+						</List>
+					)}
+				</div>
+
+				<div>
+					<List component='nav' aria-label='friends'>
+						<ListItem
+							button
+							onClick={() => {
+								history.push("/Concord/friends");
+							}}
+						>
+							<ListItemText className={classes.text} primary='Friends' />
 						</ListItem>
-					) : (
-						data.getConversations.map((user) => (
-							<ListItem
-								button
-								key={user.id}
-								onClick={() => {
-									history.push("/Concord/friend/" + user.id);
-								}}
-							>
+						<Divider />
+						{!data && loading ? (
+							<ListItem button>
 								<ListItemText
 									className={classes.text}
-									primary={user.username}
+									primary='Search For Friends'
 								/>
 							</ListItem>
-						))
-					)}
-				</List>
+						) : (
+							data.getConversations.map((user) => (
+								<ListItem
+									button
+									key={user.id}
+									onClick={() => {
+										history.push("/Concord/friend/" + user.id);
+									}}
+								>
+									<ListItemText
+										className={classes.text}
+										primary={user.username}
+									/>
+									<div
+										className={user.online ? classes.online : classes.offline}
+									>
+										{user.online ? "online" : "offline"}
+									</div>
+								</ListItem>
+							))
+						)}
+					</List>
+				</div>
 			</div>
+			{u && <div className={classes.userSide}>@ {u.userHandle}</div>}
 		</div>
 	);
 };
@@ -167,6 +192,7 @@ const GET_CONVERSATIONS = gql`
 			email
 			username
 			userHandle
+			online
 		}
 	}
 `;
@@ -192,8 +218,8 @@ const GET_NEW_CONVO = gql`
 	}
 `;
 
-const mapStateToProps = (state) => ({
-	user: state.user.user,
-});
+// const mapStateToProps = (state) => ({
+// 	user: state.user.user,
+// });
 
-export default connect(mapStateToProps)(FriendsList);
+export default FriendsList;

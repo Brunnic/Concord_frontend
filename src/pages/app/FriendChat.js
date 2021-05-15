@@ -6,6 +6,7 @@ import {
 	ListItemText,
 	Input,
 	IconButton,
+	Button,
 } from "@material-ui/core";
 import { gql, useQuery, useLazyQuery, useMutation } from "@apollo/client";
 import { connect } from "react-redux";
@@ -21,7 +22,7 @@ const useStyles = makeStyles({
 		color: "white",
 		display: "flex",
 		flexDirection: "column",
-		width: "100%",
+		width: "inherit",
 	},
 	friend_container: {
 		height: "88%",
@@ -29,6 +30,11 @@ const useStyles = makeStyles({
 	header: {
 		boxShadow: "0 1px 2px 0 rgba(0,0,0,0.7)",
 		padding: "0.5rem",
+		display: "flex",
+		flexDirection: "row",
+		justifyContent: "space-between",
+		width: "inherit",
+		alignItems: "center",
 	},
 	send_container: {
 		padding: "1rem",
@@ -48,6 +54,15 @@ const useStyles = makeStyles({
 	},
 	sendIcon: {
 		flex: 1,
+	},
+	online: {
+		color: "#009432",
+	},
+	offline: {
+		color: "#EA2027",
+	},
+	addButton: {
+		height: "80%",
 	},
 });
 
@@ -127,7 +142,27 @@ const FriendChat = ({ friend, user, history }) => {
 		<div className={classes.container}>
 			{theFriend && !friendLoading ? (
 				<div className={classes.friend_container}>
-					<div className={classes.header}>@ {theFriend.user.userHandle}</div>
+					<div className={classes.header}>
+						<div>
+							<span>@ {theFriend.user.userHandle} </span>
+							<span
+								className={
+									theFriend.user.online ? classes.online : classes.offline
+								}
+							>
+								{theFriend.user.online ? "online" : "offline"}
+							</span>
+						</div>
+						<div>
+							<Button
+								className={classes.addButton}
+								variant='contained'
+								color='primary'
+							>
+								Add Friend
+							</Button>
+						</div>
+					</div>
 
 					{data && !loading ? (
 						<Messages
@@ -158,13 +193,15 @@ const FriendChat = ({ friend, user, history }) => {
 						onChange={handleChange}
 					/>
 				</form>
-				<IconButton
-					color='primary'
-					className={classes.sendIcon}
-					onClick={handleSubmit}
-				>
-					<SendIcon />
-				</IconButton>
+				<div>
+					<IconButton
+						color='primary'
+						className={classes.sendIcon}
+						onClick={handleSubmit}
+					>
+						<SendIcon />
+					</IconButton>
+				</div>
 			</div>
 		</div>
 	);
@@ -177,6 +214,7 @@ const GET_FRIEND = gql`
 			email
 			username
 			userHandle
+			online
 		}
 	}
 `;

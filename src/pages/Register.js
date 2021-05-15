@@ -153,7 +153,7 @@ const Register = ({ history }) => {
 							});
 						}}
 					>
-						Log In
+						Register
 					</Button>
 				</div>
 

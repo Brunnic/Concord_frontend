@@ -34,13 +34,15 @@ const theme = createMuiTheme({
 
 function App({ checkUser }) {
 	const { data, loading, error } = useQuery(GET_USER, {
-		onCompleted: async () => {
-			checkUser();
-		},
+		onCompleted: async () => {},
 		onError: (err) => {
 			console.log(err);
 		},
 	});
+
+	React.useEffect(() => {
+		checkUser();
+	}, []);
 
 	return (
 		<ThemeProvider theme={theme}>

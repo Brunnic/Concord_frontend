@@ -34,6 +34,5 @@
 			"react-app/jest"
 		]
 	},
-	"browserslist": [],
-	"proxy": "http://localhost:4000"
+	"browserslist": []
 }

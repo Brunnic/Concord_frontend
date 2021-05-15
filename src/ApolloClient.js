@@ -8,15 +8,28 @@ import { setContext } from "@apollo/client/link/context";
 import { WebSocketLink } from "@apollo/client/link/ws";
 import { getMainDefinition } from "@apollo/client/utilities";
 
+let wsUri = "";
+let httpUri = "";
+
+if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
+	// dev code
+	wsUri = "ws://localhost:4000/subscriptions";
+	httpUri = "http://localhost:4000/graphql";
+} else {
+	// production code
+	wsUri = "wss://concord-brunnic.herokuapp.com/subscriptions";
+	httpUri = "https://concord-brunnic.herokuapp.com/graphql";
+}
+
 const wsLink = new WebSocketLink({
-	uri: "wss://concord-brunnic.herokuapp.com/subscriptions",
+	uri: wsUri,
 	options: {
 		reconnect: true,
 	},
 });
 
 const httpLink = createHttpLink({
-	uri: "https://concord-brunnic.herokuapp.com/graphql",
+	uri: httpUri,
 });
 
 const splitLink = split(
