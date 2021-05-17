@@ -8,3 +8,17 @@ body {
 	padding: 0;
 	background-color: #292929;
 }
+
+.userSide {
+	padding: 1rem;
+	color: white;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	transition: background-color 0.4s;
+}
+
+.userSide:hover {
+	background-color: #202020;
+	cursor: pointer;
+}

@@ -51,7 +51,7 @@ const Home = ({ history, user, logout }) => {
 						Concord
 					</Typography>
 					<div>
-						{Object.keys(user).length < 1 ? (
+						{Object.keys(user).length < 1 && user ? (
 							<React.Fragment>
 								<Button color='inherit' onClick={() => history.push("/login")}>
 									Login

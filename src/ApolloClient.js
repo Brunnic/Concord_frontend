@@ -1,12 +1,13 @@
 import {
 	InMemoryCache,
 	ApolloClient,
-	createHttpLink,
 	split,
+	createHttpLink,
 } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 import { WebSocketLink } from "@apollo/client/link/ws";
 import { getMainDefinition } from "@apollo/client/utilities";
+import { createUploadLink } from "apollo-upload-client";
 
 let wsUri = "";
 let httpUri = "";
@@ -28,7 +29,7 @@ const wsLink = new WebSocketLink({
 	},
 });
 
-const httpLink = createHttpLink({
+const httpLink = createUploadLink({
 	uri: httpUri,
 });
 

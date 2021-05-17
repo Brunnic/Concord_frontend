@@ -1,11 +1,11 @@
 import React from "react";
 import { makeStyles } from "@material-ui/styles";
 import { connect } from "react-redux";
-import { gql, useMutation } from "@apollo/client";
 
 import FriendsList from "../components/Friends/FriendsList";
 import Friends from "./app/Friends";
 import FriendChat from "./app/FriendChat";
+import User from "./app/User";
 
 const useStyles = makeStyles({
 	app: {
@@ -25,7 +25,7 @@ const useStyles = makeStyles({
 	},
 });
 
-const MainApp = ({ path, history }) => {
+const MainApp = ({ path, history, refetchUser }) => {
 	switch (path) {
 		case "friends":
 			return <Friends history={history} />;
@@ -36,54 +36,27 @@ const MainApp = ({ path, history }) => {
 					history={history}
 				/>
 			);
+		case "me":
+			return <User history={history} refetchUser={refetchUser} />;
 		default:
 			return null;
 	}
 };
 
-const Concord = ({ location, history, user, loading }) => {
+const Concord = ({ location, history, user, loading, u, refetchUser }) => {
 	const classes = useStyles();
 	const [onlineIndicator, setOnlineIndicator] = React.useState(0);
-
-	const [updateOnlineStatus] = useMutation(UPDATE_USER_STATUS);
 
 	React.useEffect(() => {
 		if (Object.keys(user).length < 1 && !loading) history.replace("/login");
 	}, [user]);
-
-	React.useEffect(() => {
-		updateOnlineStatus({ variables: { isOnline: true } });
-		setOnlineIndicator(
-			setInterval(
-				() =>
-					updateOnlineStatus({
-						variables: { isOnline: true },
-					}),
-				30000
-			)
-		);
-
-		return () => {
-			clearInterval(onlineIndicator);
-			updateOnlineStatus({ variables: { isOnline: false } });
-		};
-	}, []);
-
-	const handleDisconnection = (e) => {
-		updateOnlineStatus({ variables: { isOnline: false } });
-	};
-
-	React.useEffect(() => {
-		window.addEventListener("beforeunload", handleDisconnection);
-		window.addEventListener("unload", handleDisconnection);
-	}, []);
 
 	return (
 		<div className={classes.app}>
 			{/* SIDE BAR */}
 			{!loading && (
 				<div className={classes.friends}>
-					<FriendsList history={history} user={user} />
+					<FriendsList history={history} userId={user.id} user={u} />
 				</div>
 			)}
 
@@ -95,6 +68,7 @@ const Concord = ({ location, history, user, loading }) => {
 						.filter((l, i) => i >= 2)
 						.join("/")}
 					history={history}
+					refetchUser={refetchUser}
 				/>
 			</div>
 		</div>
@@ -105,13 +79,5 @@ const mapStateToProps = (state) => ({
 	user: state.user.user,
 	loading: state.user.loading,
 });
-
-const UPDATE_USER_STATUS = gql`
-	mutation updateOnlineStatus($isOnline: Boolean!) {
-		updateOnlineStatus(isOnline: $isOnline) {
-			online
-		}
-	}
-`;
 
 export default connect(mapStateToProps)(Concord);
